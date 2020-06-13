@@ -122,8 +122,6 @@ def trans_stl():
     gaussian_blur = Gaussian_blur(kernel=9)
     trans.append(gaussian_blur)
     trans.append(transforms.ToTensor())
-    tl = translation(lam=0.2)
-    trans.append(tl)
     trans.append(transforms.Normalize((0.4313, 0.4156, 0.3663), (0.2683, 0.2610, 0.2687)))
     trans = transforms.Compose(trans)
     return trans
@@ -152,18 +150,3 @@ class Gaussian_blur(object):
             img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         return img
 
-class translation(object):
-    def __init__(self, lam):
-        super(translation, self).__init__()
-        self.lam = lam
-
-    def __call__(self, img):
-        a = random.uniform(0, self.lam)
-        _, h, w = img.size()
-        pad = nn.ReflectionPad2d(padding=(int(a * h), 0, int(a * w), 0))
-        new_img = pad(img.unsqueeze(0)).squeeze()
-        new_img = new_img[:, 0: h, 0: w]
-        b = random.randint(0, 1)
-        if b == 0:
-            img = new_img
-        return img
